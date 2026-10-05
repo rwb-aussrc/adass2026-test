@@ -1,0 +1,141 @@
+name: Report paper builds
+
+on:
+  workflow_run:
+    workflows:
+      - Build papers
+    types:
+      - completed
+
+permissions:
+  actions: read
+  pull-requests: write
+
+jobs:
+  report:
+    # Only report successful builds for pull requests.
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Find pull request
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id
+            });
+
+            const pullRequests = run.data.pull_requests;
+
+            if (pullRequests.length === 0) {
+              core.setFailed('Could not find a pull request for this workflow run.');
+              return;
+            }
+
+            core.setOutput('number', pullRequests[0].number);
+
+      - name: Find PDF artifacts
+        id: artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = context.payload.workflow_run.id;
+
+            const { data } =
+              await github.rest.actions.listWorkflowRunArtifacts({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: runId,
+                per_page: 100
+              });
+
+            const artifacts = data.artifacts
+              .filter(a => !a.expired)
+              .filter(a => a.name.endsWith('-pdf'))
+              .sort((a, b) => a.name.localeCompare(b.name));
+
+            const result = artifacts.map(a => ({
+              name: a.name.replace(/-pdf$/, ''),
+              url:
+                `${context.serverUrl}/${context.repo.owner}/` +
+                `${context.repo.repo}/actions/runs/${runId}/artifacts/${a.id}`
+            }));
+
+            core.setOutput('artifacts', JSON.stringify(result));
+
+      - name: Update PR comment
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          ARTIFACTS: ${{ steps.artifacts.outputs.artifacts }}
+        with:
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+            const artifacts = JSON.parse(process.env.ARTIFACTS);
+
+            const marker = '<!-- paper-build-report -->';
+
+            const run = context.payload.workflow_run;
+
+            let body;
+
+            if (artifacts.length === 0) {
+              body = [
+                marker,
+                '### 📄 Paper builds',
+                '',
+                'No PDF artifacts were produced.',
+                '',
+                `[Workflow run](${run.html_url})`
+              ].join('\n');
+            } else {
+              const links = artifacts.map(a =>
+                `- [📄 ${a.name}.pdf](${a.url})`
+              );
+
+              body = [
+                marker,
+                '### 📄 Paper previews',
+                '',
+                ...links,
+                '',
+                `_Built from commit \`${run.head_sha.slice(0, 7)}\` · ` +
+                `[workflow run](${run.html_url})_`
+              ].join('\n');
+            }
+
+            const comments =
+              await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                per_page: 100
+              });
+
+            const existing = comments.data.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body
+              });
+            }
