@@ -1,0 +1,78 @@
+name: Build papers
+
+on:
+  pull_request:
+    paths: ['papers/**']
+  workflow_dispatch:      # manual run builds every paper
+
+jobs:
+  # Work out which papers/<PID>/ directories the PR changed
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      pids: ${{ steps.find.outputs.pids }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: find
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            dirs=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- papers | cut -d/ -f2 | sort -u)
+          else
+            dirs=$(ls papers)
+          fi
+          # only directories that still exist and are papers (deleted ones are skipped)
+          pids=$(for d in $dirs; do [ -f "papers/$d/makedefs" ] && echo "$d"; done | jq -R . | jq -sc .)
+          echo "Papers: $pids"
+          if [ "${{ github.event_name }}" = "pull_request" ] && [ $(echo "$pids" | jq length) -gt 1 ]; then
+            echo "::warning::This PR touches more than one paper: $pids"
+          fi
+          echo "pids=$pids" >> "$GITHUB_OUTPUT"
+
+  # One build per changed paper, inside its own directory
+  build:
+    needs: changes
+    if: needs.changes.outputs.pids != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pid: ${{ fromJSON(needs.changes.outputs.pids) }}
+    name: ${{ matrix.pid }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile ${{ matrix.pid }}.tex
+        uses: xu-cheng/latex-action@v3
+        with:
+          working_directory: papers/${{ matrix.pid }}
+          root_file: ${{ matrix.pid }}.tex
+          # latexmk runs bibtex only when the paper has a \bibliography
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Show LaTeX errors
+        if: failure()
+        working-directory: papers/${{ matrix.pid }}
+        run: |
+          echo "::error file=papers/${{ matrix.pid }}/${{ matrix.pid }}.tex::LaTeX build failed for ${{ matrix.pid }}"
+          [ -f ${{ matrix.pid }}.log ] && grep -n -A4 -E '^!|:[0-9]+: ' ${{ matrix.pid }}.log || true
+
+      # PaperCheck problems are for the editors to judge, so they only warn
+      - name: PaperCheck
+        working-directory: papers/${{ matrix.pid }}
+        continue-on-error: true
+        run: |
+          if ! make check; then
+            echo "::warning file=papers/${{ matrix.pid }}/${{ matrix.pid }}.tex::PaperCheck reported problems for ${{ matrix.pid }}"
+            exit 1
+          fi
+
+      - name: Upload PDF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.pid }}
+          path: papers/${{ matrix.pid }}/${{ matrix.pid }}.pdf
+          if-no-files-found: ignore

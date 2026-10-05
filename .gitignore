@@ -1,0 +1,21 @@
+# LaTeX build products
+*.aux
+*.log
+*.out
+*.blg
+*.bbl
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+papers/*/[A-Z][0-9][0-9][0-9].pdf
+papers/*/[A-Z][0-9][0-9][0-9].toc
+papers/*/*_inc.tex
+papers/*/*.check
+
+# old upload route, not needed with PRs
+papers/*/*.tar.gz
+papers/*/*.zip
+
+__pycache__/
+.DS_Store
+.test/
