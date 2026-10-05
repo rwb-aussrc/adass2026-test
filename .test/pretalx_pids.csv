@@ -1,0 +1,12 @@
+ID,PID,Session type,Track,Speaker names,Proposal title
+TST008,B601,BoF,The art of collaboration in astronomy software development,Iris Fixture,Test BoF
+TST002,C101,Contributed Talk,AI as a tool for data discovery and data management,"Ben Example, Carla Coauthor",Test contributed talk with two speakers
+TST003,C102,Contributed Talk,AI as a tool for data discovery and data management,Dana Van Der Sample,Test second contributed talk in the same track
+TST004,C201,Contributed Talk,AI as tool for scientific discovery,Eve Müller-Testa,Test contributed talk with an accented hyphenated name
+TST007,F501,Focus Demo,"Usability, accessibility and security in astronomy software",Hugo Mock,Test focus demo
+TST001,I101,Invited Talk,AI as a tool for data discovery and data management,Ada Testperson,Test invited talk
+TST005,P301,Poster,AI as tool for software engineering,Finn Placeholder,Test poster that was never formally accepted
+TST006,P401,Featured Poster,Building and operating science platforms and workflows in the Petabyte Era,Gita Dummy,Test featured poster
+TST010,P801,Featured Poster,"Topical Computing, Software and Algorithms",Kim Trial,Test featured poster in the last track
+TST011,P802,Poster,"Topical Computing, Software and Algorithms",Lee Sandbox,Test poster in the last track
+TST009,T701,Tutorial,Global data management and lifecycle in the exascale era,Jon Stub,Test tutorial

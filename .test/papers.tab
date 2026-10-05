@@ -1,0 +1,59 @@
+# uncomment a contribution when it compiles clean with "p clean pdf" and  "p asp1"
+# but check to see if book0 works, then it can stay commented out
+# grep ^# papers.tab | grep -v ready | grep -v ok|wc      -> 93
+# ---------------------------------------------------------------------------------
+#                                                                     
+John Doe                        ; 999
+
+#   3 in ## difficult   grep ^## papers/papers.tab 
+#  15 to come
+#  50 no response yet
+#  total:  105
+#
+# Ceballos-Merino Maria          	;  3     /19
+#
+
+# Comments are authors that have not submitted
+#
+#
+# Each paper will be assigned an ID known as a PID. The PID syntax in 2026 is XNNN
+# where X is one of:
+#     - I for invited talk
+#     - C for contributed talk
+#     - P for poster
+#     - F for focus demo
+#     - B for BoF
+#     - T for tutorial
+# and NNN is a three-digit number with the most-significant digit corresponding the associated Track number
+
+#
+#-Author ; PID 
+# ^ These are necessary for the helper script
+
+#  /-   means no copyright form has been filled out yet yet
+#  /C   means copyright form ok
+
+# - means We don't have final paper
+# F means we do have the final paper
+
+# Author ; PID  Editor  Copyright Form Status
+
+\part{AI as a tool for data discovery and data management}
+Testperson, Ada                  ;  I101   TBD  /-  -
+Example, Ben                     ;  C101   TBD  /-  -
+Sample, Dana Van Der             ;  C102   TBD  /-  -
+\part{AI as tool for scientific discovery}
+Müller-Testa, Eve                ;  C201   TBD  /-  -
+\part{AI as tool for software engineering}
+Placeholder, Finn                ;  P301   TBD  /-  -
+\part{Building and operating science platforms and workflows in the Petabyte Era}
+Dummy, Gita                      ;  P401   TBD  /-  -
+\part{Usability, accessibility and security in astronomy software}
+Mock, Hugo                       ;  F501   TBD  /-  -
+\part{The art of collaboration in astronomy software development}
+Fixture, Iris                    ;  B601   TBD  /-  -
+\part{Global data management and lifecycle in the exascale era}
+Stub, Jon                        ;  T701   TBD  /-  -
+\part{Topical Computing, Software and Algorithms}
+Trial, Kim                       ;  P801   TBD  /-  -
+Sandbox, Lee                     ;  P802   TBD  /-  -

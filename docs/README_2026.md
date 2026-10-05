@@ -223,7 +223,7 @@ Your paper's folder, `papers/<PID>/`, contains:
 | `<PID>.bib` | your references; starts as the template's examples (`example.bib`) |
 | `makedefs` | your macros (PID, surname, email, figures), included by the Makefile |
 | `Makefile` | `make pdf`, `make check` |
-| `asp2021.sty` | the required ASP LaTeX style file |
+| `asp2023.sty` | the required ASP LaTeX style file |
 | `asp2021.bst` | the required ASP bibliography style file |
 | `example.jpg`, `example.eps` | the template's example figures; delete them when no longer used |
 | `copyrightform.pdf` | the blank ASP copyright form |
