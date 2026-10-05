@@ -8,48 +8,7 @@ on:
 
 jobs:
   changes:
-    runs-on: ubuntu-latest
-
-    outputs:
-      pids: ${{ steps.find.outputs.pids }}
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - id: find
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            dirs=$(
-              git diff --name-only \
-                "origin/${{ github.base_ref }}...HEAD" \
-                -- papers |
-              cut -d/ -f2 |
-              sort -u
-            )
-          else
-            dirs=$(ls papers)
-          fi
-
-          # Only directories that still exist and are papers.
-          pids=$(
-            for d in $dirs; do
-              [ -f "papers/$d/makedefs" ] && echo "$d"
-            done |
-            jq -R . |
-            jq -sc .
-          )
-
-          echo "Papers: $pids"
-
-          if [ "${{ github.event_name }}" = "pull_request" ] &&
-             [ "$(echo "$pids" | jq length)" -gt 1 ]; then
-            echo "::warning::This PR touches more than one paper: $pids"
-          fi
-
-          echo "pids=$pids" >> "$GITHUB_OUTPUT"
+    uses: ./.github/workflows/find-papers.yml
 
   build:
     needs: changes
@@ -87,17 +46,6 @@ jobs:
           if [ -f "${{ matrix.pid }}.log" ]; then
             grep -n -A4 -E '^!|:[0-9]+: ' \
               "${{ matrix.pid }}.log" || true
-          fi
-
-      # PaperCheck problems are for the editors to judge,
-      # so they only warn.
-      - name: PaperCheck
-        working-directory: papers/${{ matrix.pid }}
-        continue-on-error: true
-        run: |
-          if ! make check; then
-            echo "::warning file=papers/${{ matrix.pid }}/${{ matrix.pid }}.tex::PaperCheck reported problems for ${{ matrix.pid }}"
-            exit 1
           fi
 
       - name: Upload PDF

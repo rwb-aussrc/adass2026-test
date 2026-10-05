@@ -147,6 +147,9 @@ import time
 import AdassChecks
 import TexScanner
 
+import functools
+open = functools.partial(open, encoding="latin-1")  # 2026: raw bytes, as in Python 2
+
 # ------------------------------------------------------------------------------
 
 #                         F i n d  T e x  F i l e

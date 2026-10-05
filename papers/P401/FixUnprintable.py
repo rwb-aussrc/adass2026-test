@@ -62,6 +62,9 @@ import string
 
 import AdassChecks
 
+import functools
+open = functools.partial(open, encoding="latin-1")  # 2026: raw bytes, as in Python 2
+
 def NextVersion (FileName) :
    NextVersion = FileName + '_1'
    Number = 1

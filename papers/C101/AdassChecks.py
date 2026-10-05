@@ -269,6 +269,9 @@ import subprocess
 
 import TexScanner
 
+import functools
+open = functools.partial(open, encoding="latin-1")  # 2026: raw bytes, as in Python 2
+
 # ------------------------------------------------------------------------------
 
 #                 A d a s s  C o n f e r e n c e  D e t a i l s
