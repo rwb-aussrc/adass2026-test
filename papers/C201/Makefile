@@ -14,6 +14,10 @@
                     # put your paper_id here (with dash, not dot), e.g. P10-2
                     # or find your template on http://www.astro.umd.edu/~teuben/adass/papers/
                     # the detect_tex.py script might also find it
+# the directory holding this Makefile and the scripts: ./ in a paper folder,
+# ../Author_Template/ when run through pmake; set before makedefs is included
+TEMPLATE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+
 P = P10-2
 P = $(shell ./detect_tex.py | grep -v '^%' | sed 's/.tex//g')
                     # keep incrementing this after each upload of your $(P)
@@ -126,11 +130,11 @@ clean:
 	rm -f $(P).bbl $(P).blg $(P).pdf $(P).aux $(P).log $(P).out $(P).toc $(P)_inc.tex $(P).txt
 
 check:
-	python3 -W ignore::SyntaxWarning PaperCheck.py $(P) $(A)
+	python3 -W ignore::SyntaxWarning $(TEMPLATE_DIR)PaperCheck.py $(P) $(A)
 
 ENCODING =
 fix:
-	python3 FixUnprintable.py  $(P).tex $(ENCODING)
+	python3 -W ignore::SyntaxWarning $(TEMPLATE_DIR)FixUnprintable.py  $(P).tex $(ENCODING)
 
 inc:
 	tex2inc.py $(P).tex > $(P)_inc.tex
