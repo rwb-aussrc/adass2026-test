@@ -174,22 +174,25 @@ LaTeX, or check the length, spelling or grammar of your paper.
 
 ## Step 3: Submit your paper as a pull request
 
-1. Fork the proceedings repository, or create a branch if you have write access.
-2. Change **only** files in your own folder, `papers/<PID>/`.
-3. Commit:
+The proceedings repository's own `README.md` walks through every step, with the exact
+git commands and GitHub buttons, and a browser-only route if you don't use git. In
+short:
+
+1. **Fork** the proceedings repository. Everyone works in their own fork; you don't
+   need write access to the proceedings repository.
+2. In your fork, make a branch named after your PID.
+3. Change **only** files in your own folder, `papers/<PID>/`, and commit only:
    - `<PID>.tex`
    - `<PID>.bib`
    - your figures, `<PID>_f1.png` etc.
    - `makedefs`
-   - your signed copyright form, `copyrightForm_<PID>_<Surname>.pdf`
-
-   Fill in the whole copyright form (`copyrightform.pdf` in your folder), and sign and
-   date it. The name above, with `<Surname>` as `A` in `makedefs`, is the one
-   `make check` looks for.
 4. Don't commit `<PID>.pdf` or other build products; `.gitignore` takes care of that.
-   You also don't need to send any other files, and don't change the `Makefile`, style
-   files or scripts.
-5. Open a pull request titled `<PID>: <your paper title>`.
+   Don't change the `Makefile`, style files or scripts. Don't commit your signed
+   copyright form either: it carries your signature, so send it to the editors. Fill
+   in the whole form (`copyrightform.pdf` in your folder), and sign and date it, as
+   `copyrightForm_<PID>_<Surname>.pdf`, with `<Surname>` as `A` in `makedefs`.
+5. Push the branch to your fork and open a pull request from it to the proceedings
+   repository, titled `<PID>: <your paper title>`. **One paper per pull request.**
 
 Every push to your pull request is built and checked automatically. A LaTeX error fails
 the check, with the error lines in the job log. PaperCheck problems are shown as
@@ -209,7 +212,6 @@ papers/C101/
     C101_f1.png
     C101_f2.jpg
     makedefs
-    copyrightForm_C101_Teuben.pdf
     (plus the template files below, unchanged)
 ```
 

@@ -10,6 +10,23 @@ jobs:
   changes:
     uses: ./.github/workflows/find-papers.yml
 
+  # Report paper builds needs the PR number, and GitHub leaves it out of the
+  # workflow_run event when the PR comes from a fork, so pass it on here.
+  pr-number:
+    if: github.event_name == 'pull_request'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Save the PR number
+        run: echo "${{ github.event.pull_request.number }}" > pr-number
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr-number
+          path: pr-number
+          retention-days: 1
+
   build:
     needs: changes
     if: needs.changes.outputs.pids != '[]'
